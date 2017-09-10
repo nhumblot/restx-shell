@@ -3,7 +3,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <systemPropertyVariables>
-                        <restxSourcesRootDir>${project.basedir}/../</restxSourcesRootDir>
+                        <restxShellSourcesRootDir>${project.basedir}/../</restxShellSourcesRootDir>
                         <maxParallelTestThreads>10</maxParallelTestThreads>
                     </systemPropertyVariables>
                 </configuration>

@@ -165,7 +165,11 @@ public class RestxModuleDescriptorsDiscrepanciesDetectorWithPomAndIvyTest {
     }
 
     private static Path getRestxSourcesRootDir() {
-        return Paths.get(System.getProperty("restxSourcesRootDir"));
+        String restxShellSourcesRootDirProp = System.getProperty("restxShellSourcesRootDir");
+        if(restxShellSourcesRootDirProp == null) {
+            throw new IllegalArgumentException("You need to put -DrestxShellSourcesRootDir=/path/to/restx-shell/rootdir while executing this test !");
+        }
+        return Paths.get(restxShellSourcesRootDirProp);
     }
 
     public RestxModuleDescriptorsDiscrepanciesDetectorWithPomAndIvyTest(String moduleName, GenerationType generationType) {
