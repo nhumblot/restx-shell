@@ -18,6 +18,10 @@
             <groupId>io.restx</groupId>
             <artifactId>restx-factory</artifactId>
         </dependency>
+        <!--
+        Remove this dependency in the future by extracting required stuff in shared lib between restx-shell and restx
+        See https://github.com/restx/restx/issues/97
+         -->
         <dependency>
             <groupId>io.restx</groupId>
             <artifactId>restx-core</artifactId>
