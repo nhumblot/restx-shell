@@ -1,6 +1,6 @@
 {
-    "parent": "io.restx:restx-parent:${restx.version}",
-    "module": "io.restx:restx-shell-manager:${restx.version}",
+    "parent": "io.restx:restx-shell-parent:${restx.shell.version}",
+    "module": "io.restx:restx-shell-manager:${restx.shell.version}",
 
     "properties": {
         "@files": ["../restx.build.properties.json"]
@@ -8,7 +8,7 @@
 
     "dependencies": {
         "compile": [
-            "io.restx:restx-shell:${restx.version}",
+            "io.restx:restx-shell:${restx.shell.version}",
             "com.fasterxml.jackson.core:jackson-databind:${jackson.version}",
             "org.apache.ivy:ivy:${ivy.version}"
         ],

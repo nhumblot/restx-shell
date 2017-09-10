@@ -1,6 +1,6 @@
 {
-    "parent": "io.restx:restx-parent:${restx.version}",
-    "module": "io.restx:restx-build:${restx.version}",
+    "parent": "io.restx:restx-shell-parent:${restx.shell.version}",
+    "module": "io.restx:restx-build:${restx.shell.version}",
 
     "properties": {
         "@files": ["../restx.build.properties.json"],

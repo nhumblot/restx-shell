@@ -1,18 +1,24 @@
 {
-    "parent": "io.restx:restx-parent:${restx.version}",
-    "module": "io.restx:restx-core-shell:${restx.version}",
+    "parent": "io.restx:restx-shell-parent:${restx.shell.version}",
+    "module": "io.restx:restx-core-shell:${restx.shell.version}",
 
     "properties": {
         "@files": ["../restx.build.properties.json"]
+    },
+
+    "fragments": {
+        "maven": [
+            "classpath:///restx/build/fragments/maven/testing-core-shell.xml"
+        ]
     },
 
     "dependencies": {
         "compile": [
             "io.restx:restx-factory:${restx.version}",
             "io.restx:restx-core:${restx.version}",
-            "io.restx:restx-shell:${restx.version}",
-            "io.restx:restx-shell-manager:${restx.version}",
-            "io.restx:restx-build:${restx.version}",
+            "io.restx:restx-shell:${restx.shell.version}",
+            "io.restx:restx-shell-manager:${restx.shell.version}",
+            "io.restx:restx-build:${restx.shell.version}",
             "org.apache.ivy:ivy:${ivy.version}",
             "org.mindrot:jbcrypt:0.3m"
         ],

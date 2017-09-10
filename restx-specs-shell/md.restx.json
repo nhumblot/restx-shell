@@ -1,6 +1,6 @@
 {
-    "parent": "io.restx:restx-parent:${restx.version}",
-    "module": "io.restx:restx-specs-shell:${restx.version}",
+    "parent": "io.restx:restx-shell-parent:${restx.shell.version}",
+    "module": "io.restx:restx-specs-shell:${restx.shell.version}",
 
     "properties": {
         "@files": ["../restx.build.properties.json"]
@@ -9,8 +9,8 @@
     "dependencies": {
         "compile": [
             "io.restx:restx-factory:${restx.version}",
-            "io.restx:restx-shell:${restx.version}",
-            "io.restx:restx-core-shell:${restx.version}",
+            "io.restx:restx-shell:${restx.shell.version}",
+            "io.restx:restx-core-shell:${restx.shell.version}",
             "io.restx:restx-specs-server:${restx.version}"
         ]
     }
