@@ -106,6 +106,11 @@ public class NewAppTest {
     }
 
     private static AppShellCommand.NewAppDescriptor createDescriptor(String name, boolean generateHelloResource, List<ModuleDescriptorType> buildFiles) throws IOException {
+        String restxVersion = System.getProperty("restxVersion");
+        if(restxVersion == null) {
+            throw new IllegalArgumentException("You need to put -DrestxVersion=xxx while executing this test !");
+        }
+
         AppShellCommand.NewAppDescriptor desc = new AppShellCommand.NewAppDescriptor();
         desc.appName = name+"App";
         desc.groupId = "com.foo";
@@ -119,20 +124,9 @@ public class NewAppTest {
         desc.defaultPort = "8080";
         desc.baseAPIPath = "/api";
         desc.javaVersion = "1.7";
-        desc.restxVersion = resolveCurrentModuleVersion();
+        desc.restxVersion = restxVersion;
         desc.includeStatsModule = false;
         desc.generateHelloResource = generateHelloResource;
         return desc;
-    }
-
-    private static String resolveCurrentModuleVersion() throws IOException {
-        Path restxModuleDescriptor = Paths.get(".").resolve("md.restx.json");
-        if(Files.notExists(restxModuleDescriptor)){
-            throw new FileNotFoundException("md.restx.json not found !");
-        }
-
-        try(FileInputStream fis = new FileInputStream(restxModuleDescriptor.toFile());) {
-            return new RestxJsonSupport().parse(fis).getGav().getVersion();
-        }
     }
 }
