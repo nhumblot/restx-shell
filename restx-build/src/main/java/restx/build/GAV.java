@@ -80,6 +80,32 @@ public class GAV {
         return groupId + ":" + artifactId + ":" + version;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GAV gav = (GAV) o;
+
+        if (optional != gav.optional) return false;
+        if (!groupId.equals(gav.groupId)) return false;
+        if (!artifactId.equals(gav.artifactId)) return false;
+        if (!version.equals(gav.version)) return false;
+        if (type != null ? !type.equals(gav.type) : gav.type != null) return false;
+        return classifier != null ? classifier.equals(gav.classifier) : gav.classifier == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = groupId.hashCode();
+        result = 31 * result + artifactId.hashCode();
+        result = 31 * result + version.hashCode();
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (classifier != null ? classifier.hashCode() : 0);
+        result = 31 * result + (optional ? 1 : 0);
+        return result;
+    }
+
     /**
      * toString() will only generate simple GAV whereas toParseableString()
      * should generate a String that should return the same GAV content when parsed
