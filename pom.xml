@@ -63,7 +63,7 @@
 
     <properties>
         <!-- RestX -->
-        <restx.version>0.35-rc1</restx.version>
+        <restx.version>0.35-rc2</restx.version>
         <restx.shell.version>0.35-SNAPSHOT</restx.shell.version>
 
         <!-- Compiler -->
@@ -98,6 +98,11 @@
             <dependency>
                 <groupId>io.restx</groupId>
                 <artifactId>restx-core</artifactId>
+                <version>${restx.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.restx</groupId>
+                <artifactId>restx-md-fragments</artifactId>
                 <version>${restx.version}</version>
             </dependency>
             <dependency>
