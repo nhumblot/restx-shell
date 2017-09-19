@@ -1,0 +1,8 @@
+{
+    "parent": "io.restx:restx-shell-parent:${restx.shell.version}",
+    "module": "io.restx:restx-shell-md-fragments:${restx.shell.version}",
+
+    "properties": {
+        "@files": ["../restx.build.properties.json"]
+    }
+}

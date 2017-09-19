@@ -52,6 +52,7 @@
     </scm>
 
     <modules>
+        <module>restx-shell-md-fragments</module>
         <module>restx-package</module>
         <module>restx-build</module>
         <module>restx-core-shell</module>
@@ -104,6 +105,11 @@
                 <groupId>io.restx</groupId>
                 <artifactId>restx-md-fragments</artifactId>
                 <version>${restx.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.restx</groupId>
+                <artifactId>restx-shell-md-fragments</artifactId>
+                <version>${restx.shell.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.restx</groupId>

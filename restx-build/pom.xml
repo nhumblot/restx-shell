@@ -19,6 +19,14 @@
 
     <dependencies>
         <dependency>
+            <groupId>io.restx</groupId>
+            <artifactId>restx-md-fragments</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.restx</groupId>
+            <artifactId>restx-shell-md-fragments</artifactId>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>

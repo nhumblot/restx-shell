@@ -14,6 +14,10 @@
     },
 
     "dependencies": {
+        "compile": [
+            "io.restx:restx-md-fragments:${restx.version}",
+            "io.restx:restx-shell-md-fragments:${restx.shell.version}"
+        ],
         "test": [
             "junit:junit:${junit.version}",
             "org.assertj:assertj-core:${assertj-core.version}"
