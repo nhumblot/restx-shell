@@ -95,4 +95,51 @@ public class GAV {
         }
         return groupId + ":" + artifactId + ":" + version + ":" + type + ":" + classifier + suffix;
     }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private String groupId;
+        private String artifactId;
+        private String version;
+        private String type;
+        private String classifier;
+        private boolean optional = false;
+
+        public Builder g(String groupId) {
+            this.groupId = groupId;
+            return this;
+        }
+
+        public Builder a(String artifactId) {
+            this.artifactId = artifactId;
+            return this;
+        }
+
+        public Builder v(String version) {
+            this.version = version;
+            return this;
+        }
+
+        public Builder t(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public Builder c(String classifier) {
+            this.classifier = classifier;
+            return this;
+        }
+
+        public Builder opt(boolean optional) {
+            this.optional = optional;
+            return this;
+        }
+
+        public GAV create(){
+            return new GAV(groupId, artifactId, version, type, classifier, optional);
+        }
+    }
 }
