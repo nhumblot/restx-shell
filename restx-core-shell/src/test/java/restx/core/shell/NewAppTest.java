@@ -1,5 +1,6 @@
 package restx.core.shell;
 
+import com.googlecode.junittoolbox.ParallelParameterized;
 import jline.console.ConsoleReader;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
@@ -25,7 +26,7 @@ import static org.mockito.Mockito.*;
 /**
  * @author fcamblor
  */
-@RunWith(Parameterized.class)
+@RunWith(ParallelParameterized.class)
 public class NewAppTest {
 
     @Rule

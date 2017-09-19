@@ -4,6 +4,7 @@
                 <configuration>
                     <systemPropertyVariables>
                         <restxVersion>${restx.version}</restxVersion>
+                        <maxParallelTestThreads>10</maxParallelTestThreads>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

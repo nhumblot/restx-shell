@@ -25,7 +25,8 @@
         "test": [
             "junit:junit:${junit.version}",
             "org.apache.maven.shared:maven-verifier:${maven-verifier.version}",
-            "org.mockito:mockito-all:${mockito.version}"
+            "org.mockito:mockito-all:${mockito.version}",
+            "com.googlecode.junit-toolbox:junit-toolbox:2.3"
         ]
     }
 }

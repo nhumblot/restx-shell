@@ -24,5 +24,6 @@
         <dependency org="junit" name="junit" rev="4.11" conf="test->default" />
         <dependency org="org.apache.maven.shared" name="maven-verifier" rev="1.4" conf="test->default" />
         <dependency org="org.mockito" name="mockito-all" rev="1.9.5" conf="test->default" />
+        <dependency org="com.googlecode.junit-toolbox" name="junit-toolbox" rev="2.3" conf="test->default" />
     </dependencies>
 </ivy-module>

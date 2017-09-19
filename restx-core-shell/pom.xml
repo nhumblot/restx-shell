@@ -61,6 +61,12 @@
             <artifactId>mockito-all</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <!-- For parallel Parameterized tests execution -->
+            <groupId>com.googlecode.junit-toolbox</groupId>
+            <artifactId>junit-toolbox</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -71,6 +77,7 @@
                 <configuration>
                     <systemPropertyVariables>
                         <restxVersion>${restx.version}</restxVersion>
+                        <maxParallelTestThreads>10</maxParallelTestThreads>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
