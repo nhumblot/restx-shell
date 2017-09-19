@@ -60,6 +60,7 @@
         <module>restx-shell-manager</module>
         <module>restx-build-shell</module>
         <module>restx-specs-shell</module>
+        <module>restx-build-testing</module>
     </modules>
 
     <properties>
@@ -98,7 +99,17 @@
             </dependency>
             <dependency>
                 <groupId>io.restx</groupId>
+                <artifactId>restx-common</artifactId>
+                <version>${restx.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.restx</groupId>
                 <artifactId>restx-core</artifactId>
+                <version>${restx.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.restx</groupId>
+                <artifactId>restx-specs-server</artifactId>
                 <version>${restx.version}</version>
             </dependency>
             <dependency>
@@ -133,8 +144,8 @@
             </dependency>
             <dependency>
                 <groupId>io.restx</groupId>
-                <artifactId>restx-specs-server</artifactId>
-                <version>${restx.version}</version>
+                <artifactId>restx-build-testing</artifactId>
+                <version>${restx.shell.version}</version>
             </dependency>
 
             <!-- Jackson -->

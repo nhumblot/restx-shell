@@ -1,12 +1,14 @@
-package restx.build.shell;
+package restx.build.testing;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.io.LineProcessor;
 import com.googlecode.junittoolbox.ParallelParameterized;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -15,18 +17,23 @@ import org.junit.runners.Parameterized;
 import restx.build.*;
 import restx.common.OSUtils;
 
-import java.io.*;
-import java.nio.file.*;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(ParallelParameterized.class)
-public class RestxModuleDescriptorsDiscrepanciesDetectorWithPomAndIvyTest {
+public abstract class AbstractRestxModuleDescriptorsDiscrepanciesDetectorWithPomAndIvyTest {
 
-    private enum GenerationType {
+    protected enum GenerationType {
         IVY("module.ivy") {
             @Override
             public RestxBuild.Generator generator() {
@@ -80,7 +87,14 @@ public class RestxModuleDescriptorsDiscrepanciesDetectorWithPomAndIvyTest {
                         assertTrue(logFile.delete());
                         removeGeneratedLineIn(effectivePom);
                     } catch (VerificationException | IOException e) {
-                        throw Throwables.propagate(e);
+                        String wrappingMessage;
+                        try {
+                            wrappingMessage = String.format("Error encountered with following POM : %n%s", com.google.common.io.Files.toString(targetPom, Charsets.UTF_8));
+                        } catch (IOException e1) {
+                            throw Throwables.propagate(e1);
+                        }
+
+                        throw new RuntimeException(wrappingMessage, e);
                     }
 
                     System.out.println("Over");
@@ -129,20 +143,19 @@ public class RestxModuleDescriptorsDiscrepanciesDetectorWithPomAndIvyTest {
 
         public abstract RestxBuild.Generator generator();
         public void assertExistingAndGeneratedDescriptorsAreSimilar(File existingDescriptor, File generatedDescriptor, TemporaryFolder tempFolder) throws IOException {
-            assertEquals(com.google.common.io.Files.toString(existingDescriptor, Charsets.UTF_8),
+            Assert.assertEquals(com.google.common.io.Files.toString(existingDescriptor, Charsets.UTF_8),
                     com.google.common.io.Files.toString(generatedDescriptor, Charsets.UTF_8));
         }
     }
 
-    private final String moduleName;
-    private final GenerationType generationType;
-
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
 
-    @Parameterized.Parameters(name="{0}/{1}")
-    public static Iterable<Object[]> data(){
-        Path restxSourcesRootDir = getRestxSourcesRootDir();
+    private final String moduleName;
+    private final GenerationType generationType;
+
+    protected static Iterable<Object[]> data(String sysPropertyName, List<String> ignoredModuleNames){
+        Path restxSourcesRootDir = getRestxSourcesRootDir(sysPropertyName);
         String[] directories = restxSourcesRootDir.toFile().list(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
@@ -154,7 +167,8 @@ public class RestxModuleDescriptorsDiscrepanciesDetectorWithPomAndIvyTest {
         for(String moduleName: directories) {
             if(Files.exists(restxSourcesRootDir.resolve(moduleName).resolve("md.restx.json"))) {
                 for(GenerationType generationType: GenerationType.values()) {
-                    if(Files.exists(restxSourcesRootDir.resolve(moduleName).resolve(generationType.filename))) {
+                    if(Files.exists(restxSourcesRootDir.resolve(moduleName).resolve(generationType.filename))
+                            && !ignoredModuleNames.contains(moduleName)) {
                         testingData.add(new Object[]{ moduleName, generationType });
                     }
                 }
@@ -164,22 +178,22 @@ public class RestxModuleDescriptorsDiscrepanciesDetectorWithPomAndIvyTest {
         return testingData;
     }
 
-    private static Path getRestxSourcesRootDir() {
-        String restxShellSourcesRootDirProp = System.getProperty("restxShellSourcesRootDir");
+    private static Path getRestxSourcesRootDir(String sysPropertyName) {
+        String restxShellSourcesRootDirProp = System.getProperty(sysPropertyName);
         if(restxShellSourcesRootDirProp == null) {
-            throw new IllegalArgumentException("You need to put -DrestxShellSourcesRootDir=/path/to/restx-shell/rootdir while executing this test !");
+            throw new IllegalArgumentException(String.format("You need to put -D%s=/path/to/restx-shell/rootdir while executing this test !", sysPropertyName));
         }
         return Paths.get(restxShellSourcesRootDirProp);
     }
 
-    public RestxModuleDescriptorsDiscrepanciesDetectorWithPomAndIvyTest(String moduleName, GenerationType generationType) {
+    protected AbstractRestxModuleDescriptorsDiscrepanciesDetectorWithPomAndIvyTest(String moduleName, GenerationType generationType) {
         this.moduleName = moduleName;
         this.generationType = generationType;
     }
 
     @Test
     public void should_restx_module_descriptor_and_pom_or_ivy_descriptors_equivalents() throws IOException {
-        Path restxSourcesRootDir = getRestxSourcesRootDir();
+        Path restxSourcesRootDir = getRestxSourcesRootDir(getRestxSourcesDirSysProp());
         Path moduleDirectory = restxSourcesRootDir.resolve(this.moduleName);
         File existingDescriptor = moduleDirectory.resolve(this.generationType.filename).toFile();
 
@@ -196,4 +210,6 @@ public class RestxModuleDescriptorsDiscrepanciesDetectorWithPomAndIvyTest {
 
         this.generationType.assertExistingAndGeneratedDescriptorsAreSimilar(existingDescriptor, generatedDescriptor, tempFolder);
     }
+
+    protected abstract String getRestxSourcesDirSysProp();
 }

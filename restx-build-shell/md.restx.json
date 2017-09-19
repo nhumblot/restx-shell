@@ -20,9 +20,7 @@
         ],
         "test": [
             "junit:junit:4.11",
-            "com.googlecode.junit-toolbox:junit-toolbox:2.3",
-            "org.assertj:assertj-core:1.6.0",
-            "org.apache.maven.shared:maven-verifier:${maven-verifier.version}"
+            "io.restx:restx-build-testing:${restx.shell.version}"
         ]
     }
 }
