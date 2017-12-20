@@ -18,31 +18,38 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class GAVConsistenciesTest {
 
     @Parameterized.Parameters(name="{0}")
-    public static List<String[]> data() {
+    public static List<Object[]> data() {
         return Arrays.asList(
                 // Parsing regular artefacts
-                new String[]{ "fr.4sh.pom-parents:4sh-uberpom:0.8" },
-                new String[]{ "restx:restx-common:0.2-SNAPSHOT" },
-                new String[]{ "joda-time:joda-time:${joda-time.version}" },
+                new Object[]{ "fr.4sh.pom-parents:4sh-uberpom:0.8", GAV.builder().g("fr.4sh.pom-parents").a("4sh-uberpom").v("0.8").create() },
+                new Object[]{ "restx:restx-common:0.2-SNAPSHOT", GAV.builder().g("restx").a("restx-common").v("0.2-SNAPSHOT").create() },
+                new Object[]{ "joda-time:joda-time:${joda-time.version}", GAV.builder().g("joda-time").a("joda-time").v("${joda-time.version}").create() },
 
                 // classifiers
-                new String[]{ "restx:restx-ui:0.2:zip:jdk8" },
-                new String[]{ "restx:restx-ui:0.2:jar:jdk8" },
+                new Object[]{ "restx:restx-ui:0.2:zip:jdk8", GAV.builder().g("restx").a("restx-ui").v("0.2").t("zip").c("jdk8").create() },
+                new Object[]{ "restx:restx-ui:0.2:jar:jdk8", GAV.builder().g("restx").a("restx-ui").v("0.2").t("jar").c("jdk8").create() },
 
                 // optionals
-                new String[]{ "restx:restx-ui:0.2!optional" },
-                new String[]{ "restx:restx-ui:0.2:zip!optional" },
-                new String[]{ "restx:restx-ui:0.2:jar:jdk8!optional" },
+                new Object[]{ "restx:restx-ui:0.2!optional", GAV.builder().g("restx").a("restx-ui").v("0.2").opt(true).create() },
+                new Object[]{ "restx:restx-ui:0.2:zip!optional", GAV.builder().g("restx").a("restx-ui").v("0.2").t("zip").opt(true).create() },
+                new Object[]{ "restx:restx-ui:0.2:jar:jdk8!optional", GAV.builder().g("restx").a("restx-ui").v("0.2").t("jar").c("jdk8").opt(true).create() },
 
                 // type
-                new String[]{ "restx:restx-ui:0.2:zip" }
+                new Object[]{ "restx:restx-ui:0.2:zip", GAV.builder().g("restx").a("restx-ui").v("0.2").t("zip").create() }
         );
     }
 
     private String gavStr;
+    private GAV expectedGAV;
 
-    public GAVConsistenciesTest(String gavStr) {
+    public GAVConsistenciesTest(String gavStr, GAV expectedGAV) {
         this.gavStr = gavStr;
+        this.expectedGAV = expectedGAV;
+    }
+
+    @Test
+    public void parsed_gav_should_be_valid() {
+        assertThat(GAV.parse(this.gavStr)).isEqualTo(this.expectedGAV);
     }
 
     @Test
