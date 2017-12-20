@@ -1,6 +1,9 @@
 package restx.build;
 
+import org.junit.Assume;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,95 +11,68 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.hamcrest.CoreMatchers.is;
 
 /**
  * User: xavierhanin
  * Date: 4/14/13
  * Time: 1:57 PM
  */
+@RunWith(Parameterized.class)
 public class RestxBuildTest {
-    private RestxJsonSupport json = new RestxJsonSupport();
-    private MavenSupport maven = new MavenSupport();
-    private IvySupport ivy = new IvySupport();
 
-    @Test
-    public void should_generate_simple_pom() throws Exception {
-        shouldGenerate(json, "Module1.restx.json", maven, "Module1.pom.xml");
+    private final String moduleFileNameToTest;
+    private final RestxBuild.Parser parser;
+    private final String expectedModuleFileName;
+    private final RestxBuild.Generator generator;
+    private Boolean bijectionTest;
+
+    @Parameterized.Parameters(name="{0}")
+    public static List<Object[]> data() {
+        RestxJsonSupport json = new RestxJsonSupport();
+        MavenSupport maven = new MavenSupport();
+        IvySupport ivy = new IvySupport();
+
+        return Arrays.asList(
+                new Object[]{ "Module1.restx.json", json, "Module1.pom.xml", maven, Boolean.TRUE },
+                new Object[]{ "Module3.restx.json", json, "Module3.pom.xml", maven, Boolean.FALSE }, // No bijection because of fragment
+                new Object[]{ "Module4.restx.json", json, "Module4.pom.xml", maven, Boolean.TRUE },
+                new Object[]{ "Module5.restx.json", json, "Module5.pom.xml", maven, Boolean.FALSE }, // No bijection because of @file
+                new Object[]{ "Module6.restx.json", json, "Module6.pom.xml", maven, Boolean.FALSE }, // No bijection because of @file
+                new Object[]{ "Module7.restx.json", json, "Module7.pom.xml", maven, Boolean.FALSE }, // No bijection because of fragment
+                new Object[]{ "Module8.restx.json", json, "Module8.pom.xml", maven, Boolean.TRUE },
+                new Object[]{ "Module9.restx.json", json, "Module9.pom.xml", maven, Boolean.TRUE },
+                new Object[]{ "Module1.restx.json", json, "Module1.ivy", ivy, Boolean.FALSE }, // No bijection because ivy is ot a parser
+                new Object[]{ "Module2.restx.json", json, "Module2.ivy", ivy, Boolean.FALSE }, // No bijection because ivy is ot a parser
+                new Object[]{ "Module4.restx.json", json, "Module4.ivy", ivy, Boolean.FALSE }, // No bijection because ivy is ot a parser
+                new Object[]{ "Module5.restx.json", json, "Module5.ivy", ivy, Boolean.FALSE }  // No bijection because ivy is ot a parser
+        );
+    }
+
+    public RestxBuildTest(String moduleFileNameToTest, RestxBuild.Parser parser, String expectedModuleFileName, RestxBuild.Generator generator, Boolean bijectionTest) {
+        this.moduleFileNameToTest = moduleFileNameToTest;
+        this.parser = parser;
+        this.expectedModuleFileName = expectedModuleFileName;
+        this.generator = generator;
+        this.bijectionTest = bijectionTest;
     }
 
     @Test
-    public void should_generate_simple_pom_with_external_properties() throws Exception {
-        shouldGenerate(json, "Module5.restx.json", maven, "Module5.pom.xml");
+    public void should_parsing_equals_generation() throws Exception {
+        shouldGenerate(moduleFileNameToTest, parser, expectedModuleFileName, generator);
     }
 
     @Test
-    public void should_generate_pom_with_fragment() throws Exception {
-        shouldGenerate(json, "Module3.restx.json", maven, "Module3.pom.xml");
+    public void should_generation_equals_parsing() throws Exception {
+        Assume.assumeThat(bijectionTest, is(Boolean.TRUE));
+        shouldGenerate(expectedModuleFileName, (RestxBuild.Parser) generator, moduleFileNameToTest, (RestxBuild.Generator) parser);
     }
 
-    @Test
-    public void should_generate_pom_with_war() throws Exception {
-        shouldGenerate(json, "Module4.restx.json", maven, "Module4.pom.xml");
-    }
-
-    @Test
-    public void should_parse_simple_pom() throws Exception {
-        shouldGenerate(maven, "Module1.pom.xml", json, "Module1.restx.json");
-    }
-
-    @Test
-    public void should_parse_simple_pom_with_war() throws Exception {
-        shouldGenerate(maven, "Module4.pom.xml", json, "Module4.restx.json");
-    }
-
-    @Test
-    public void should_generate_simple_ivy() throws Exception {
-        shouldGenerate(json, "Module1.restx.json", ivy, "Module1.ivy");
-    }
-
-    @Test
-    public void should_generate_simple_ivy_with_external_properties() throws Exception {
-        shouldGenerate(json, "Module5.restx.json", ivy, "Module5.ivy");
-    }
-
-    @Test
-    public void should_generate_simple_ivy_war() throws Exception {
-        shouldGenerate(json, "Module4.restx.json", ivy, "Module4.ivy");
-    }
-
-    @Test
-    public void should_generate_ivy_with_internal_dep() throws Exception {
-        shouldGenerate(json, "Module2.restx.json", ivy, "Module2.ivy");
-    }
-
-    @Test
-    public void should_generate_pom_with_type() throws Exception {
-        shouldGenerate(json, "Module6.restx.json", maven, "Module6.pom.xml");
-    }
-
-    @Test
-    public void should_generate_pom_with_merged_fragments() throws Exception {
-        shouldGenerate(json, "Module7.restx.json", maven, "Module7.pom.xml");
-    }
-
-    @Test
-    public void should_generate_pom_with_tools_dependency() throws Exception {
-        shouldGenerate(json, "Module8.restx.json", maven, "Module8.pom.xml");
-    }
-
-    @Test
-    public void should_generate_pom_with_optional_dependency() throws Exception {
-        shouldGenerate(json, "Module9.restx.json", maven, "Module9.pom.xml");
-    }
-
-    @Test
-    public void should_parse_simple_pom_with_optional_dependency() throws Exception {
-        shouldGenerate(maven, "Module9.pom.xml", json, "Module9.restx.json");
-    }
-
-    private void shouldGenerate(RestxBuild.Parser parser, String module, RestxBuild.Generator generator, String expected) throws IOException {
+    private void shouldGenerate(String module, RestxBuild.Parser parser, String expected, RestxBuild.Generator generator) throws IOException {
         URL resource = getClass().getResource(module);
         ModuleDescriptor md;
         if (resource.getProtocol().equals("file")) {
