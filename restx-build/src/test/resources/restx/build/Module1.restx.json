@@ -12,6 +12,7 @@
         "compile": [
             "com.google.guava:guava:14.0-rc2",
             "joda-time:joda-time:${joda-time.version}",
+            "org.eclipse.jetty:jetty-server:${jetty7.version}!excluding(org.eclipse.jetty.orbit:javax.servlet)",
             "com.github.spullara.mustache.java:compiler:0.8.10"
         ],
         "test": [

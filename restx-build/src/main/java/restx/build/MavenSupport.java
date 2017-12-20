@@ -78,13 +78,34 @@ public class MavenSupport implements RestxBuild.Parser, RestxBuild.Generator {
         }
 
         private GAV getGav(JSONObject jsonObject, String typeKey, GAV parentGAV) {
+            List<GAV.Exclusion> exclusions = null;
+            if(jsonObject.has("exclusions")) {
+                exclusions = new ArrayList<>();
+
+                Object exclusionsNodesObj = jsonObject.getJSONObject("exclusions").get("exclusion");
+                JSONArray exclusionsNodes;
+                if(exclusionsNodesObj instanceof JSONArray) {
+                    exclusionsNodes = (JSONArray)exclusionsNodesObj;
+                } else {
+                    exclusionsNodes = new JSONArray();
+                    exclusionsNodes.put(exclusionsNodesObj);
+                }
+
+                for(int j=0; j<exclusionsNodes.length(); j++) {
+                    JSONObject exclusionNode = exclusionsNodes.getJSONObject(j);
+                    exclusions.add(new GAV.Exclusion(exclusionNode.getString("groupId"), exclusionNode.getString("artifactId")));
+                }
+            }
+
             return new GAV(
                     jsonObject.has("groupId")?jsonObject.getString("groupId"):parentGAV==null?null:parentGAV.getGroupId(),
                     jsonObject.has("artifactId")?jsonObject.getString("artifactId"):parentGAV==null?null:parentGAV.getArtifactId(),
                     jsonObject.has("version")?String.valueOf(jsonObject.get("version")):parentGAV==null?null:parentGAV.getVersion(),
                     typeKey==null?null:jsonObject.has(typeKey)?jsonObject.getString(typeKey):parentGAV==null?null:parentGAV.getType(),
                     jsonObject.has("classifier")?jsonObject.getString("classifier"):null,
-                    jsonObject.has("optional")?jsonObject.getBoolean("optional"):false);
+                    jsonObject.has("optional")?jsonObject.getBoolean("optional"):false,
+                    exclusions
+            );
         }
     }
     static class Generator {
@@ -186,6 +207,17 @@ public class MavenSupport implements RestxBuild.Parser, RestxBuild.Generator {
             }
             if(gav.isOptional()) {
                 writeXmlTag(w, indent, "optional", Boolean.TRUE.toString());
+            }
+            if(gav.getExclusions() != null) {
+                w.write("            <exclusions>\n");
+                for(GAV.Exclusion exclusion: gav.getExclusions()) {
+                    w.write("                <exclusion>\n");
+                    writeXmlTag(w, "                    ", "groupId", exclusion.getGroupId());
+                    writeXmlTag(w, "                    ", "artifactId", exclusion.getArtifactId());
+                    w.write("                </exclusion>\n");
+
+                }
+                w.write("            </exclusions>\n");
             }
         }
 
