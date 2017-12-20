@@ -5,7 +5,7 @@
     <parent>
         <artifactId>restx-shell-parent</artifactId>
         <groupId>io.restx</groupId>
-        <version>1.0-rc1</version>
+        <version>1.0-rc2-SNAPSHOT</version>
     </parent>
 
     <artifactId>restx-build-testing</artifactId>
