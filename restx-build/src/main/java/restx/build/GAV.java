@@ -1,5 +1,11 @@
 package restx.build;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * User: xavierhanin
  * Date: 4/14/13
@@ -7,24 +13,57 @@ package restx.build;
  */
 public class GAV {
     private static final String OPTIONAL_SUFFIX = "!optional";
-    public static GAV parse(String gav) {
-        String[] parts = gav.split(":");
-        if (parts.length < 3 || parts.length > 5) {
-            throw new IllegalArgumentException("can't parse '" + gav + "' as a module coordinates (GAV). " +
-                    "It must have at least 3 parts separated by columns. (4th and 5th are optional and correspond to artifact type and classifier)");
+    private static final Pattern EXCLUSIONS_SUFFIX = Pattern.compile("(.*)!excluding\\(([^)]+)\\)(.*)");
+
+    public static class Exclusion {
+        private final String groupId;
+        private final String artifactId;
+
+        public Exclusion(String groupId, String artifactId) {
+            this.groupId = groupId;
+            this.artifactId = artifactId;
         }
-        boolean optional = false;
-        if(parts[parts.length-1].endsWith(OPTIONAL_SUFFIX)) {
-            optional = true;
-            parts[parts.length-1] = parts[parts.length-1].substring(0, parts[parts.length-1].length()-OPTIONAL_SUFFIX.length());
+
+        public String getGroupId() {
+            return groupId;
         }
-        if(parts.length == 3) {
-            return new GAV(parts[0], parts[1], parts[2], optional);
+
+        public String getArtifactId() {
+            return artifactId;
         }
-        if(parts.length == 4) {
-        	return new GAV(parts[0], parts[1], parts[2], parts[3], optional);
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Exclusion exclusion = (Exclusion) o;
+
+            if (groupId != null ? !groupId.equals(exclusion.groupId) : exclusion.groupId != null) return false;
+            return artifactId != null ? artifactId.equals(exclusion.artifactId) : exclusion.artifactId == null;
         }
-    	return new GAV(parts[0], parts[1], parts[2], parts[3], parts[4], optional);
+
+        @Override
+        public int hashCode() {
+            int result = groupId != null ? groupId.hashCode() : 0;
+            result = 31 * result + (artifactId != null ? artifactId.hashCode() : 0);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return groupId + ':' + artifactId;
+        }
+
+        public static List<Exclusion> parse(String str) {
+            String[] exclusionsStr = str.split(",");
+            List<Exclusion> exclusions = new ArrayList();
+            for(int i=0; i<exclusionsStr.length; i++) {
+                String[] parts = exclusionsStr[i].split(":");
+                exclusions.add(new Exclusion(parts[0], parts[1]));
+            }
+            return exclusions;
+        }
     }
 
     private final String groupId;
@@ -33,6 +72,7 @@ public class GAV {
     private final String type;
     private final String classifier;
     private final boolean optional;
+    private final List<Exclusion> exclusions;
 
     public GAV(String groupId, String artifactId, String version, final boolean optional) {
         this(groupId, artifactId, version, null, null, optional);
@@ -43,12 +83,17 @@ public class GAV {
     }
     
     public GAV(final String groupId, final String artifactId, final String version, final String type, final String classifier, final boolean optional) {
+        this(groupId, artifactId, version, type, classifier, optional, null);
+    }
+
+    public GAV(final String groupId, final String artifactId, final String version, final String type, final String classifier, final boolean optional, List<Exclusion> exclusions) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
         this.type = type;
         this.classifier = classifier;
         this.optional = optional;
+        this.exclusions = exclusions;
     }
 
     public String getGroupId() {
@@ -75,6 +120,10 @@ public class GAV {
         return optional;
     }
 
+    public List<Exclusion> getExclusions() {
+        return exclusions;
+    }
+
     @Override
     public String toString() {
         return groupId + ":" + artifactId + ":" + version;
@@ -92,7 +141,8 @@ public class GAV {
         if (!artifactId.equals(gav.artifactId)) return false;
         if (!version.equals(gav.version)) return false;
         if (type != null ? !type.equals(gav.type) : gav.type != null) return false;
-        return classifier != null ? classifier.equals(gav.classifier) : gav.classifier == null;
+        if (classifier != null ? !classifier.equals(gav.classifier) : gav.classifier != null) return false;
+        return exclusions != null ? exclusions.equals(gav.exclusions) : gav.exclusions == null;
     }
 
     @Override
@@ -103,6 +153,7 @@ public class GAV {
         result = 31 * result + (type != null ? type.hashCode() : 0);
         result = 31 * result + (classifier != null ? classifier.hashCode() : 0);
         result = 31 * result + (optional ? 1 : 0);
+        result = 31 * result + (exclusions != null ? exclusions.hashCode() : 0);
         return result;
     }
 
@@ -112,14 +163,59 @@ public class GAV {
      * through GAV.parse()
      */
     public String toParseableString(){
-        String suffix = optional?OPTIONAL_SUFFIX:"";
-        if (type == null){
-            return groupId + ":" + artifactId + ":" + version + suffix;
+        StringBuilder builder = new StringBuilder();
+        builder.append(groupId + ":" + artifactId + ":" + version);
+        if(type == null) {
+            // nothing to add
+        } else {
+            builder.append(":" + type);
+            if(classifier != null) {
+                builder.append(":" + classifier);
+            }
         }
-        if(classifier == null) {
-            return groupId + ":" + artifactId + ":" + version + ":" + type + suffix;
+
+        if(optional) {
+            builder.append(OPTIONAL_SUFFIX);
         }
-        return groupId + ":" + artifactId + ":" + version + ":" + type + ":" + classifier + suffix;
+
+        if(exclusions != null) {
+            builder.append("!excluding(");
+            for(Exclusion exclusion: exclusions) {
+                builder.append(exclusion).append(",");
+            }
+            builder.setCharAt(builder.length()-1, ')');
+        }
+
+        return builder.toString();
+    }
+
+    public static GAV parse(String gav) {
+        Builder gavBuilder = GAV.builder();
+        if(gav.contains(OPTIONAL_SUFFIX)) {
+            gavBuilder.opt(true);
+            gav = gav.replace(OPTIONAL_SUFFIX, "");
+        }
+        Matcher exclusionsMatcher = EXCLUSIONS_SUFFIX.matcher(gav);
+        if(exclusionsMatcher.matches()) {
+            List<Exclusion> exclusions = Exclusion.parse(exclusionsMatcher.group(2));
+            gavBuilder.excl(exclusions.toArray(new Exclusion[0]));
+            gav = gav.replaceAll(EXCLUSIONS_SUFFIX.pattern(), "$1$3");
+        }
+
+        String[] parts = gav.split(":");
+        if (parts.length < 3 || parts.length > 5) {
+            throw new IllegalArgumentException("can't parse '" + gav + "' as a module coordinates (GAV). " +
+                    "It must have at least 3 parts separated by columns. (4th and 5th are optional and correspond to artifact type and classifier)");
+        }
+
+        gavBuilder.g(parts[0]).a(parts[1]).v(parts[2]);
+        if(parts.length >= 4) {
+            gavBuilder.t(parts[3]);
+        }
+        if(parts.length >= 5) {
+            gavBuilder.c(parts[4]);
+        }
+        return gavBuilder.create();
     }
 
     public static Builder builder() {
@@ -133,6 +229,7 @@ public class GAV {
         private String type;
         private String classifier;
         private boolean optional = false;
+        private List<Exclusion> exclusions = null;
 
         public Builder g(String groupId) {
             this.groupId = groupId;
@@ -164,8 +261,13 @@ public class GAV {
             return this;
         }
 
+        public Builder excl(Exclusion... exclusions) {
+            this.exclusions = Arrays.asList(exclusions);
+            return this;
+        }
+
         public GAV create(){
-            return new GAV(groupId, artifactId, version, type, classifier, optional);
+            return new GAV(groupId, artifactId, version, type, classifier, optional, exclusions);
         }
     }
 }

@@ -35,7 +35,13 @@ public class GAVConsistenciesTest {
                 new Object[]{ "restx:restx-ui:0.2:jar:jdk8!optional", GAV.builder().g("restx").a("restx-ui").v("0.2").t("jar").c("jdk8").opt(true).create() },
 
                 // type
-                new Object[]{ "restx:restx-ui:0.2:zip", GAV.builder().g("restx").a("restx-ui").v("0.2").t("zip").create() }
+                new Object[]{ "restx:restx-ui:0.2:zip", GAV.builder().g("restx").a("restx-ui").v("0.2").t("zip").create() },
+
+                // exclusions
+                new Object[]{ "restx:restx-ui:0.2!excluding(foo.group:bar,foo.group:bar2)", GAV.builder().g("restx").a("restx-ui").v("0.2").excl(new GAV.Exclusion("foo.group", "bar"), new GAV.Exclusion("foo.group", "bar2")).create() },
+                new Object[]{ "restx:restx-ui:0.2:zip!excluding(foo.group:bar,foo.group:bar2)", GAV.builder().g("restx").a("restx-ui").v("0.2").t("zip").excl(new GAV.Exclusion("foo.group", "bar"), new GAV.Exclusion("foo.group", "bar2")).create() },
+                new Object[]{ "restx:restx-ui:0.2:jar:jdk8!excluding(foo.group:bar,foo.group:bar2)", GAV.builder().g("restx").a("restx-ui").v("0.2").t("jar").c("jdk8").excl(new GAV.Exclusion("foo.group", "bar"), new GAV.Exclusion("foo.group", "bar2")).create() },
+                new Object[]{ "restx:restx-ui:0.2:jar:jdk8!optional!excluding(foo.group:bar,foo.group:bar2)", GAV.builder().g("restx").a("restx-ui").v("0.2").t("jar").c("jdk8").opt(true).excl(new GAV.Exclusion("foo.group", "bar"), new GAV.Exclusion("foo.group", "bar2")).create() }
         );
     }
 
