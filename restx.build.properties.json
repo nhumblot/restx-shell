@@ -1,6 +1,6 @@
 {
     "restx.version": "0.35-rc2",
-    "restx.shell.version": "1.0-rc1",
+    "restx.shell.version": "1.0-SNAPSHOT",
     "java.version": "1.7",
 
     "jackson.version": "2.8.10",
