@@ -20,7 +20,7 @@
         ],
         "test": [
             "junit:junit:4.11",
-            "io.restx:restx-build-testing:${restx.shell.version}"
+            "io.restx:restx-md-testing:${restx.version}"
         ]
     }
 }

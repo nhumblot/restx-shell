@@ -60,7 +60,6 @@
         <module>restx-shell-manager</module>
         <module>restx-build-shell</module>
         <module>restx-specs-shell</module>
-        <module>restx-build-testing</module>
     </modules>
 
     <properties>
@@ -115,6 +114,11 @@
             <dependency>
                 <groupId>io.restx</groupId>
                 <artifactId>restx-md-fragments</artifactId>
+                <version>${restx.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.restx</groupId>
+                <artifactId>restx-md-testing</artifactId>
                 <version>${restx.version}</version>
             </dependency>
             <dependency>

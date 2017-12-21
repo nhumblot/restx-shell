@@ -46,7 +46,7 @@
         </dependency>
         <dependency>
             <groupId>io.restx</groupId>
-            <artifactId>restx-build-testing</artifactId>
+            <artifactId>restx-md-testing</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
