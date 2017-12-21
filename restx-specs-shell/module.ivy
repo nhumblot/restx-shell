@@ -14,9 +14,9 @@
         <artifact type="jar"/>
     </publications>
     <dependencies>
-        <dependency org="io.restx" name="restx-factory" rev="0.35-rc2" conf="default" />
+        <dependency org="io.restx" name="restx-factory" rev="0.35-rc4" conf="default" />
         <dependency org="io.restx" name="restx-shell" rev="latest.integration" conf="default" />
         <dependency org="io.restx" name="restx-core-shell" rev="latest.integration" conf="default" />
-        <dependency org="io.restx" name="restx-specs-server" rev="0.35-rc2" conf="default" />
+        <dependency org="io.restx" name="restx-specs-server" rev="0.35-rc4" conf="default" />
     </dependencies>
 </ivy-module>
