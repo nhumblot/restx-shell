@@ -1,5 +1,7 @@
 # RESTX SHELL - Command Line Interface for RestX projects
 
+[![Build Status](https://travis-ci.org/restx/restx-shell.svg?branch=master)](https://travis-ci.org/restx/restx-shell)
+
 RESTX Shell is a command line interface (CLI) for managing restx projects, from bootstrapping to daily usages like adding a dependency.
 
 It's licensed under the very commercial friendly Apache License 2, and is actively maintained by a community of developers.
