@@ -4,4 +4,4 @@ jdk:
 install:
   - /bin/true
 script:
-  - mvn clean verify -B
+  - mvn clean verify -B -Dskip-offline
